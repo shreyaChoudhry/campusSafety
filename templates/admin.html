@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>📊 Admin Dashboard</h1>
+
+<table border="1" align="center">
+    <tr>
+        <th>ID</th>
+        <th>Report</th>
+    </tr>
+
+    {% for row in data %}
+    <tr>
+        <td>{{ row[0] }}</td>
+        <td>{{ row[1] }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+<br>
+<button onclick="window.location.href='/'">Back to Home</button>
+
+</body>
+</html>
