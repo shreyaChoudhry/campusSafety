@@ -3,28 +3,127 @@
 <head>
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            width: 80%;
+            background: white;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #007BFF;
+            color: white;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            background: #0056b3;
+        }
+
+        .chart-container {
+            width: 60%;
+            margin: auto;
+            margin-top: 30px;
+        }
+    </style>
 </head>
+
 <body>
 
 <h1>📊 Admin Dashboard</h1>
 
-<table border="1" align="center">
-    <tr>
-        <th>ID</th>
-        <th>Report</th>
-    </tr>
+<div class="stats">
+    <h3>Total Reports: {{ total }}</h3>
+    <h3>Most Common Issue: {{ top_category[0] if top_category else "None" }}</h3>
+</div>
 
-    {% for row in data %}
-    <tr>
-        <td>{{ row[0] }}</td>
-        <td>{{ row[1] }}</td>
-    </tr>
-    {% endfor %}
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Category</th>
+    <th>Message</th>
+    <th>Time</th>
+    <th>Action</th>
+</tr>
 
+{% for row in data %}
+<tr>
+    <td>{{ row[0] }}</td>
+    <td>{{ row[2] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[5] if row|length > 5 else "N/A" }}</td>
+    <td>
+        <button onclick="resolveReport('{{ row[0] }}')">Resolve</button>
+    </td>
+</tr>
+{% endfor %}
 </table>
 
+<!-- 📊 CHART -->
+<div class="chart-container">
+    <canvas id="chart"></canvas>
+</div>
+
 <br>
-<button onclick="window.location.href='/'">Back to Home</button>
+
+<div style="text-align:center;">
+    <button onclick="window.location.href='/'">Back to Home</button>
+</div>
+
+<script>
+function resolveReport(id) {
+    fetch('/delete/' + id)
+    .then(() => location.reload())
+}
+</script>
+
+<!-- 📊 Chart Script -->
+<script>
+const data = {
+    labels: ["Harassment", "Theft", "Lighting Issue", "Suspicious Activity"],
+    datasets: [{
+        label: "Reports",
+        data: [5, 2, 3, 1], // demo values
+    }]
+};
+
+new Chart(document.getElementById("chart"), {
+    type: "bar",
+    data: data
+});
+</script>
 
 </body>
 </html>
