@@ -8,9 +8,124 @@
 <h2>Report Incident 🚨</h2>
 
 <form action="/submit_report" method="POST">
-    <textarea name="message" placeholder="Describe issue..." required></textarea><br><br>
+
+    <!-- Category -->
+    <select name="category" required>
+        <option value="">Select Category</option>
+        <option>Harassment</option>
+        <option>Theft</option>
+        <option>Lighting Issue</option>
+        <option>Suspicious Activity</option>
+    </select>
+
+    <br><br>
+
+    <!-- Mode -->
+    <select id="mode">
+        <option value="city">Select by City</option>
+        <option value="university">Select by University</option>
+    </select>
+
+    <br><br>
+
+    <!-- CITY -->
+    <select id="citySelect" name="location">
+        <option value="">Select City</option>
+    </select>
+
+    <!-- STATE -->
+    <select id="stateSelect" style="display:none;">
+        <option value="">Select State</option>
+        <option>Uttarakhand</option>
+        <option>Delhi</option>
+        <option>Maharashtra</option>
+        <option>Karnataka</option>
+        <option>Rajasthan</option>
+    </select>
+
+    <!-- UNIVERSITY -->
+    <select id="uniSelect" name="location" style="display:none;">
+        <option value="">Select University</option>
+    </select>
+
+    <br><br>
+
+    <!-- Message -->
+    <textarea name="message" placeholder="Describe issue..." required></textarea>
+
+    <br><br>
+
     <button type="submit">Submit</button>
+
 </form>
+
+<script>
+
+// ================= CITY =================
+const cities = [
+"Mumbai","Delhi","Bangalore","Hyderabad","Ahmedabad","Chennai","Kolkata",
+"Pune","Jaipur","Lucknow","Kanpur","Nagpur","Indore","Bhopal","Meerut"
+];
+
+const citySelect = document.getElementById("citySelect");
+
+cities.forEach(city => {
+    let option = document.createElement("option");
+    option.value = city;
+    option.text = city;
+    citySelect.appendChild(option);
+});
+
+// ================= UNIVERSITY =================
+const data = {
+    "Uttarakhand": ["COER University", "IIT Roorkee"],
+    "Delhi": ["Delhi University", "JNU"],
+    "Maharashtra": ["IIT Bombay", "Pune University"],
+    "Karnataka": ["IISc Bangalore", "Christ University"],
+    "Rajasthan": ["University of Rajasthan", "MNIT Jaipur"]
+};
+
+const stateSelect = document.getElementById("stateSelect");
+const uniSelect = document.getElementById("uniSelect");
+
+stateSelect.addEventListener("change", function() {
+    const selected = this.value;
+
+    uniSelect.innerHTML = '<option value="">Select University</option>';
+
+    data[selected].forEach(university => {
+        let option = document.createElement("option");
+        option.value = university;
+        option.text = university;
+        uniSelect.appendChild(option);
+    });
+});
+
+// ================= MODE SWITCH =================
+const mode = document.getElementById("mode");
+
+mode.addEventListener("change", function() {
+
+    if (this.value === "city") {
+        citySelect.style.display = "block";
+        stateSelect.style.display = "none";
+        uniSelect.style.display = "none";
+
+        citySelect.name = "location";
+        uniSelect.name = "";
+
+    } else {
+        citySelect.style.display = "none";
+        stateSelect.style.display = "block";
+        uniSelect.style.display = "block";
+
+        citySelect.name = "";
+        uniSelect.name = "location";
+    }
+
+});
+
+</script>
 
 </body>
 </html>
