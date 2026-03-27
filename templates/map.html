@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Safety Map</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial;
+        }
+
+        #map {
+            height: 500px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>🗺️ Safety Map (AI Risk Prediction)</h2>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    // Initialize map (Roorkee location)
+    var map = L.map('map').setView([29.8543, 77.8880], 15);
+
+    // Map tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    }).addTo(map);
+
+    // Fetch reports from backend
+    fetch('/get_reports')
+    .then(res => res.json())
+    .then(data => {
+        data.forEach(item => {
+
+            let color = "green";
+
+            if (item.risk.includes("HIGH")) color = "red";
+            else if (item.risk.includes("MEDIUM")) color = "orange";
+
+            // Circle marker for better visualization
+            L.circleMarker([item.lat, item.lng], {
+                color: color,
+                radius: 10,
+                fillOpacity: 0.6
+            })
+            .addTo(map)
+            .bindPopup(
+                "<b>Report:</b> " + item.message +
+                "<br><b>Risk:</b> " + item.risk
+            );
+        });
+    });
+</script>
+
+</body>
+</html>
