@@ -16,49 +16,92 @@
             height: 500px;
             margin: 20px;
         }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
+
 <body>
 
-<h2>🗺️ Safety Map (AI Risk Prediction)</h2>
+<h2>🗺️ Safety Map (AI Risk Visualization)</h2>
+
+<p style="font-weight:bold;">
+🔴 High Risk | 🟡 Medium Risk | 🟢 Low Risk | 🔵 COER Campus
+</p>
+
+<button onclick="toggleHeatmap()">Toggle Heatmap</button>
 
 <div id="map"></div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+<!-- Heatmap Plugin -->
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
 <script>
-    // Initialize map (Roorkee location)
-    var map = L.map('map').setView([29.8543, 77.8880], 15);
 
-    // Map tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    }).addTo(map);
+var map = L.map('map').setView([22, 78], 5); // India view
 
-    // Fetch reports from backend
-    fetch('/get_reports')
-    .then(res => res.json())
-    .then(data => {
-        data.forEach(item => {
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
 
-            let color = "green";
+let heatLayer;
+let markers = [];
 
-            if (item.risk.includes("HIGH")) color = "red";
-            else if (item.risk.includes("MEDIUM")) color = "orange";
+// Fetch data
+fetch('/get_reports')
+.then(res => res.json())
+.then(data => {
 
-            // Circle marker for better visualization
-            L.circleMarker([item.lat, item.lng], {
-                color: color,
-                radius: 10,
-                fillOpacity: 0.6
-            })
-            .addTo(map)
-            .bindPopup(
-                "<b>Report:</b> " + item.message +
-                "<br><b>Risk:</b> " + item.risk
-            );
-        });
+    let heatPoints = [];
+
+    data.forEach(item => {
+
+        // 🔥 Heat points
+        heatPoints.push([item.lat, item.lng, 1]);
+
+        // 🎯 Marker color logic
+        let color = item.color;
+
+        // 🔵 Highlight COER
+        if(item.message.toLowerCase().includes("coer")){
+            color = "blue";
+        }
+
+        let marker = L.circleMarker([item.lat, item.lng], {
+            color: color,
+            radius: 8,
+            fillOpacity: 0.7
+        })
+        .addTo(map)
+        .bindPopup(
+            "<b>Category:</b> " + item.category +
+            "<br><b>Report:</b> " + item.message
+        );
+
+        markers.push(marker);
     });
+
+    // 🔥 Heatmap
+    heatLayer = L.heatLayer(heatPoints, {
+        radius: 40,
+        blur: 25
+    }).addTo(map);
+});
+
+// 🔁 Toggle Heatmap
+function toggleHeatmap() {
+    if (map.hasLayer(heatLayer)) {
+        map.removeLayer(heatLayer);
+    } else {
+        map.addLayer(heatLayer);
+    }
+}
+
 </script>
 
 </body>
